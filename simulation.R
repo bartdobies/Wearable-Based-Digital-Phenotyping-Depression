@@ -8,7 +8,7 @@ library(purrr)
 library(cluster)
 
 # Candidate variables (ensure PHQ9 isn't included)
-candidates <- setdiff(top_20_variables, phq9_var)
+candidates <- setdiff(top_20_variables, 'PHQ9_score')
   # top_20_variables is a vector containing names of the 20 most correlated metrics with the outcome
   #phq9_var contains the name of the outcome
 
@@ -21,17 +21,17 @@ combinations <- list(
 ####### Correlation calculation
 
 # Precompute absolute Spearman correlations with PHQ-9
-phq9_abs_cor <- sapply(top_20_variables, function(v) { 
+phq9_abs_cor <- sapply(candidates, function(v) { 
   
   abs(cor(
-    df[[phq9_var]], 
+    df[['PHQ9_score']], 
     df[[v]],
     method = "spearman",
     use = "complete.obs"
   ))
 })
 
-names(phq9_abs_cor) <- top_20_variables
+names(phq9_abs_cor) <- candidates
 
 ####### Function for simulation
 
@@ -39,9 +39,7 @@ names(phq9_abs_cor) <- top_20_variables
 # keeping only the variable more strongly associated with PHQ-9
 
 prune_high_correlation <- function(vars, threshold = 0.4) {
-  
-  vars <- vars
-  
+    
   repeat {
     
     if (length(vars) <= 1) break
@@ -79,7 +77,7 @@ prune_high_correlation <- function(vars, threshold = 0.4) {
     vars <- setdiff(vars, remove)
   }
   
-  vars
+  return(vars)
 }
 
 
